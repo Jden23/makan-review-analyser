@@ -416,6 +416,36 @@ for eps, ms in [(100, 130), (100, 60), (300, 130)]:
     print(f"eps={eps:>3} m, min_samples={ms:>3} -> {n:>2} hot spots, {np.mean(labels_ == -1) * 100:4.1f}% noise")
 """)
 
+# ---------------- Step 7 ----------------
+md(r"""
+## Step 7 (optional): Send my results to the Streamlit app 🚀
+**7a. BERT predictions → the app's Hot Spots map**
+Run the next cell. It downloads `bert_predictions.csv`. Upload it to the GitHub repo, into the **`data/`** folder
+(on GitHub: open `data/` → **Add file → Upload files**). The app will then let you choose "BERT predictions" on the map.
+""")
+code(r"""
+df[['review_id', 'bert_positive_chance']].to_csv('bert_predictions.csv', index=False)
+try:
+    from google.colab import files
+    files.download('bert_predictions.csv')
+except ImportError:
+    print("Saved bert_predictions.csv (not in Colab, so no download popup)")
+""")
+md(r"""
+**7b. My fine-tuned BERT → the app's Review Checker**
+1. Make a free account on [huggingface.co](https://huggingface.co), then go to **Settings → Access Tokens** and make a token with **write** access.
+2. Run the next cell and paste the token when it asks.
+3. In the Streamlit app settings, set the secret `MODEL_ID = "<your-hf-username>/makan-bert"` (see the README).
+""")
+code(r"""
+from huggingface_hub import login
+login()   # paste your Hugging Face WRITE token
+
+model.push_to_hub("makan-bert")
+tokenizer.push_to_hub("makan-bert")
+print("✅ Uploaded! Use MODEL_ID = '<your-hf-username>/makan-bert' in the app")
+""")
+
 # ---------------- Summary ----------------
 md(r"""
 ## ✅ What I found + what I learned
@@ -436,6 +466,8 @@ md(r"""
 | 4 | BERT, WordPiece tokenizer, fine-tuning, mixed precision (FP16) | 📘 L1, L2, L4 |
 | 5 | train / dev / test split, precision, recall, F1, inference | 📘 L2 + 📗 L7 |
 | 6 | lat/long → metres, DBSCAN (`eps`, `min_samples`, -1 = noise) | 📗 L2, L6 |
+
+**Live app:** the Streamlit app (`app.py`) shows the same steps as an interactive website: a review checker, a dashboard, and the hot spots map with `eps` / `min_samples` sliders.
 
 **Ideas to make it better:** KNN to find the nearest "good" stall to each hot spot (📗 L7); XGBoost to predict stars from price + area + dish (📗 L8); put the BERT model on a Triton server (📘 L6).
 """)

@@ -11,6 +11,12 @@ A mini project that combines two NVIDIA Deep Learning Institute courses:
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Jden23/makan-review-analyser/blob/main/makan_review_analyser.ipynb)
 
+🌐 **Live app:** *(add your Streamlit link here after deploying)*
+
+The project has 2 parts:
+1. 📓 **Notebook** (`makan_review_analyser.ipynb`): the full pipeline on a GPU in Google Colab, including **training BERT**.
+2. 🌐 **Streamlit app** (`app.py`): an interactive website to show the results. You can check a review with BERT, explore the dashboard, and move the DBSCAN sliders to see the hot spots change.
+
 ---
 
 ## 🔄 How it works
@@ -34,6 +40,9 @@ Then the GPU data tools find **where** the bad reviews are packed together.
 | File | What it is |
 |---|---|
 | `makan_review_analyser.ipynb` | the main notebook (run this in Google Colab) |
+| `app.py` | the Streamlit web app |
+| `requirements.txt` | Python packages for the app |
+| `DEMO_SCRIPT.md` | a script for the video demo |
 | `data/makan_reviews.csv` | the dataset (20,200 reviews) |
 | `data/generate_data.py` | the script that made the dataset |
 
@@ -42,6 +51,35 @@ Then the GPU data tools find **where** the bad reviews are packed together.
 1. Click the **Open in Colab** button above.
 2. In Colab: **Runtime → Change runtime type → T4 GPU**.
 3. **Runtime → Run all**. It takes about 10 minutes (BERT training takes most of the time).
+
+## 🌐 The Streamlit app
+
+| Tab | What it does | Course |
+|---|---|---|
+| 🤖 Review Checker | type a review → BERT says positive / negative (+ shows the WordPiece tokens) | 📘 L1, L2, L4 |
+| 📊 Dashboard | average stars per dish, % bad per area, price buckets, pivot table (with filters) | 📗 L3 |
+| 🗺️ Hot Spots | DBSCAN on negative reviews, with `eps` / `min_samples` sliders and a map | 📗 L2, L6 |
+| 🧹 Data Cleaning | the ETL steps: before vs after, messy examples, memory per column | 📗 L2, L4 |
+
+**Run on your computer:**
+```bash
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+**Put it online for free (Streamlit Community Cloud):**
+1. Go to [share.streamlit.io](https://share.streamlit.io) and sign in with GitHub.
+2. Click **Create app → Deploy a public app from GitHub**.
+3. Repository: `Jden23/makan-review-analyser`, Branch: `main`, Main file: `app.py`.
+4. Click **Deploy**. The first start takes about 3–5 minutes (it installs PyTorch).
+
+**Which BERT model does the Review Checker use?**
+- By default: a **public** DistilBERT model that was already fine-tuned for positive/negative (on movie reviews).
+- To use **my own fine-tuned model** from the notebook: run notebook **Step 7b** (it uploads the model to Hugging Face), then in Streamlit go to **App settings → Secrets** and add:
+  ```toml
+  MODEL_ID = "your-hf-username/makan-bert"
+  ```
+- To use **my BERT predictions on the map**: run notebook **Step 7a**, then upload `bert_predictions.csv` into the `data/` folder.
 
 ## 📊 The data
 
